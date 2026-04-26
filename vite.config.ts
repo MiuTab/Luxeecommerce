@@ -3,6 +3,9 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+const repoName = 'Luxeecommerce'
+const isGithubPagesBuild = process.env.GITHUB_PAGES === 'true'
+
 
 function figmaAssetResolver() {
   return {
@@ -17,6 +20,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  base: isGithubPagesBuild ? `/${repoName}/` : '/',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
