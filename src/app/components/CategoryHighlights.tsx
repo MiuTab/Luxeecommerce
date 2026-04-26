@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CategoryHighlightsProps {
-  onCategoryClick: () => void;
+  onCategoryClick: (category: string) => void;
 }
 
 const categories = [
@@ -49,7 +49,7 @@ export function CategoryHighlights({ onCategoryClick }: CategoryHighlightsProps)
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.15 }}
               whileHover={{ y: -10 }}
-              onClick={onCategoryClick}
+              onClick={() => onCategoryClick(category.name)}
               className="group cursor-pointer relative aspect-[4/5] rounded-3xl overflow-hidden bg-accent"
             >
               <motion.div

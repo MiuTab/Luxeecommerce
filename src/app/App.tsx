@@ -17,11 +17,15 @@ type Page = 'home' | 'shop' | 'product' | 'checkout' | 'collections' | 'about';
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [shopCategoryFilter, setShopCategoryFilter] = useState<string>('All');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
 
   const addToCart = (product: any) => {
     setCartItems(prev => {
+      const addedQuantity = Number.isFinite(product.quantity) && product.quantity > 0
+        ? product.quantity
+        : 1;
       const variant = product.selectedSize || product.selectedColor || 'default';
       const existing = prev.find(item => {
         const itemVariant = item.selectedSize || item.selectedColor || 'default';
@@ -31,11 +35,11 @@ export default function App() {
         return prev.map(item => {
           const itemVariant = item.selectedSize || item.selectedColor || 'default';
           return item.id === product.id && itemVariant === variant
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + addedQuantity }
             : item;
         });
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: addedQuantity }];
     });
     setIsCartOpen(true);
   };
@@ -58,7 +62,14 @@ export default function App() {
 
   const navigateTo = (page: Page, productId?: number) => {
     setCurrentPage(page);
+    if (page === 'shop') setShopCategoryFilter('All');
     if (productId !== undefined) setSelectedProductId(productId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToShopWithCategory = (category: string) => {
+    setShopCategoryFilter(category);
+    setCurrentPage('shop');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -79,13 +90,17 @@ export default function App() {
           <Hero onShopClick={() => navigateTo('shop')} />
           <ScrollStory />
           <FeaturedProducts onProductClick={(id) => navigateTo('product', id)} onAddToCart={addToCart} />
-          <CategoryHighlights onCategoryClick={() => navigateTo('shop')} />
+          <CategoryHighlights onCategoryClick={navigateToShopWithCategory} />
           <PromoBanner />
         </>
       )}
 
       {currentPage === 'shop' && (
-        <ShopPage onProductClick={(id) => navigateTo('product', id)} onAddToCart={addToCart} />
+        <ShopPage
+          onProductClick={(id) => navigateTo('product', id)}
+          onAddToCart={addToCart}
+          initialCategory={shopCategoryFilter}
+        />
       )}
 
       {currentPage === 'product' && selectedProductId !== null && (
@@ -93,6 +108,7 @@ export default function App() {
           productId={selectedProductId}
           onAddToCart={addToCart}
           onRelatedProductClick={(id) => navigateTo('product', id)}
+          onBackToShop={() => navigateTo('shop')}
         />
       )}
 
@@ -104,7 +120,11 @@ export default function App() {
       )}
 
       {currentPage === 'collections' && (
-        <CollectionsPage onProductClick={(id) => navigateTo('product', id)} onAddToCart={addToCart} />
+        <CollectionsPage
+          onProductClick={(id) => navigateTo('product', id)}
+          onAddToCart={addToCart}
+          onViewCollection={navigateToShopWithCategory}
+        />
       )}
 
       {currentPage === 'about' && (

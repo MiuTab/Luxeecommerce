@@ -6,12 +6,14 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 interface CollectionsPageProps {
   onProductClick: (id: number) => void;
   onAddToCart: (product: any) => void;
+  onViewCollection: (category: string) => void;
 }
 
 const collections = [
   {
     id: 'tech-essentials',
     name: 'Tech Essentials',
+    category: 'Audio',
     description: 'Curated technology for the modern professional',
     tagline: 'Stay Connected',
     hero: 'https://images.unsplash.com/photo-1765279327575-bc9e453514dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
@@ -24,6 +26,7 @@ const collections = [
   {
     id: 'timepiece-collection',
     name: 'Timepiece Collection',
+    category: 'Watches',
     description: 'Elegant watches that define sophistication',
     tagline: 'Timeless Elegance',
     hero: 'https://images.unsplash.com/photo-1749831754129-3a84b9fdeb87?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
@@ -35,6 +38,7 @@ const collections = [
   {
     id: 'athletic-performance',
     name: 'Athletic Performance',
+    category: 'Footwear',
     description: 'Premium footwear engineered for excellence',
     tagline: 'Move Forward',
     hero: 'https://images.unsplash.com/photo-1625860191460-10a66c7384fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
@@ -45,7 +49,7 @@ const collections = [
   },
 ];
 
-export function CollectionsPage({ onProductClick, onAddToCart }: CollectionsPageProps) {
+export function CollectionsPage({ onProductClick, onAddToCart, onViewCollection }: CollectionsPageProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const isHeaderInView = useInView(headerRef, { once: true });
 
@@ -90,6 +94,7 @@ export function CollectionsPage({ onProductClick, onAddToCart }: CollectionsPage
             index={index}
             onProductClick={onProductClick}
             onAddToCart={onAddToCart}
+            onViewCollection={onViewCollection}
           />
         ))}
       </div>
@@ -97,7 +102,7 @@ export function CollectionsPage({ onProductClick, onAddToCart }: CollectionsPage
   );
 }
 
-function CollectionSection({ collection, index, onProductClick, onAddToCart }: any) {
+function CollectionSection({ collection, index, onProductClick, onAddToCart, onViewCollection }: any) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
   const isReversed = index % 2 === 1;
@@ -154,6 +159,7 @@ function CollectionSection({ collection, index, onProductClick, onAddToCart }: a
         </div>
 
         <motion.button
+          onClick={() => onViewCollection(collection.category)}
           whileHover={{ scale: 1.05, gap: '1rem' }}
           whileTap={{ scale: 0.95 }}
           className="group inline-flex items-center gap-3 text-primary"
@@ -176,6 +182,7 @@ function CollectionProductCard({ product, index, isInView, onProductClick, onAdd
       transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => onProductClick(product.id)}
       className="group cursor-pointer"
     >
       <div className="relative aspect-square mb-3 rounded-xl overflow-hidden bg-accent">
@@ -212,7 +219,7 @@ function CollectionProductCard({ product, index, isInView, onProductClick, onAdd
         </motion.button>
       </div>
 
-      <div onClick={() => onProductClick(product.id)}>
+      <div>
         <h4 className="text-sm mb-1 truncate">{product.name}</h4>
         <p className="text-sm">${product.price}</p>
       </div>

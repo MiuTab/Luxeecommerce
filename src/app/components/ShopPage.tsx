@@ -1,11 +1,12 @@
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SlidersHorizontal, Heart, ShoppingCart, Star } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface ShopPageProps {
   onProductClick: (id: number) => void;
   onAddToCart: (product: any) => void;
+  initialCategory?: string;
 }
 
 const allProducts = [
@@ -19,12 +20,16 @@ const allProducts = [
   { id: 8, name: 'Premium Tech Bag', price: 189, category: 'Accessories', rating: 4.8, image: 'https://images.unsplash.com/photo-1667411424961-a942201b77ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
 ];
 
-export function ShopPage({ onProductClick, onAddToCart }: ShopPageProps) {
+export function ShopPage({ onProductClick, onAddToCart, initialCategory = 'All' }: ShopPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
   const categories = ['All', 'Audio', 'Watches', 'Footwear', 'Accessories'];
+
+  useEffect(() => {
+    setSelectedCategory(categories.includes(initialCategory) ? initialCategory : 'All');
+  }, [initialCategory]);
 
   const filteredProducts = allProducts
     .filter(p => selectedCategory === 'All' || p.category === selectedCategory)
@@ -147,6 +152,7 @@ function ProductCard({ product, index, onProductClick, onAddToCart }: any) {
       transition={{ duration: 0.4, delay: index * 0.05 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => onProductClick(product.id)}
       className="group cursor-pointer"
     >
       <div className="relative aspect-square mb-4 rounded-2xl overflow-hidden bg-accent">
@@ -196,7 +202,7 @@ function ProductCard({ product, index, onProductClick, onAddToCart }: any) {
         </motion.button>
       </div>
 
-      <div onClick={() => onProductClick(product.id)}>
+      <div>
         <div className="flex items-center justify-between mb-1">
           <p className="text-xs text-muted-foreground uppercase tracking-wider">{product.category}</p>
           <div className="flex items-center gap-1">

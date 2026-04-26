@@ -82,6 +82,7 @@ function ProductCard({ product, index, isInView, onProductClick, onAddToCart }: 
       transition={{ duration: 0.6, delay: index * 0.1 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => onProductClick(product.id)}
       className="group cursor-pointer"
     >
       <div className="relative aspect-square mb-4 rounded-2xl overflow-hidden bg-accent">
@@ -131,7 +132,7 @@ function ProductCard({ product, index, isInView, onProductClick, onAddToCart }: 
         </motion.button>
       </div>
 
-      <div onClick={() => onProductClick(product.id)}>
+      <div>
         <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{product.category}</p>
         <h3 className="mb-2">{product.name}</h3>
         <p className="text-lg">${product.price}</p>

@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
-import { ShoppingCart, Menu, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ShoppingCart, Menu, Search, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { SearchModal } from './SearchModal';
 import { UserMenu } from './UserMenu';
@@ -15,12 +15,33 @@ interface HeaderProps {
 export function Header({ onNavigate, onProductClick, cartCount, onCartClick, currentPage }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const mobileNavItems = [
+    { key: 'home' as const, label: 'Home' },
+    { key: 'shop' as const, label: 'Shop' },
+    { key: 'collections' as const, label: 'Collections' },
+    { key: 'about' as const, label: 'About' },
+  ];
+
+  const handleMobileNavigate = (page: 'home' | 'shop' | 'collections' | 'about') => {
+    onNavigate(page);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <motion.header
@@ -77,11 +98,13 @@ export function Header({ onNavigate, onProductClick, cartCount, onCartClick, cur
               onClick={() => setIsSearchOpen(true)}
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
-              className="p-2 hover:bg-accent rounded-full transition-colors"
+              className="hidden md:flex p-2 hover:bg-accent rounded-full transition-colors"
             >
               <Search className="w-5 h-5" />
             </motion.button>
-            <UserMenu onNavigate={onNavigate} />
+            <div className="hidden md:block">
+              <UserMenu onNavigate={onNavigate} />
+            </div>
             <motion.button
               onClick={onCartClick}
               whileHover={{ scale: 1.1 }}
@@ -99,12 +122,47 @@ export function Header({ onNavigate, onProductClick, cartCount, onCartClick, cur
                 </motion.span>
               )}
             </motion.button>
-            <button className="md:hidden p-2">
-              <Menu className="w-5 h-5" />
-            </button>
+            <motion.button
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              whileTap={{ scale: 0.9 }}
+              className="md:hidden p-2 hover:bg-accent rounded-full transition-colors"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </motion.button>
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl"
+          >
+            <div className="max-w-7xl mx-auto px-6 py-4 space-y-2">
+              {mobileNavItems.map((item) => (
+                <motion.button
+                  key={item.key}
+                  onClick={() => handleMobileNavigate(item.key)}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full text-left px-4 py-3 rounded-xl transition-colors ${
+                    currentPage === item.key
+                      ? 'bg-accent text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
+                  }`}
+                >
+                  {item.label}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <SearchModal
         isOpen={isSearchOpen}

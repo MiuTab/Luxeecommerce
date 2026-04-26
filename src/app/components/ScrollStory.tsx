@@ -10,27 +10,65 @@ export function ScrollStory() {
     offset: ['start start', 'end end'],
   });
 
-  // Scene 1: 0-0.25 progress
-  const scene1Opacity = useTransform(scrollYProgress, [0, 0.15, 0.25], [1, 1, 0]);
-  const scene1Scale = useTransform(scrollYProgress, [0, 0.25], [1, 0.8]);
+  // Scene 1: 0-0.2 progress
+  const scene1Opacity = useTransform(scrollYProgress, [0, 0.12, 0.2], [1, 1, 0]);
+  const scene1Scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.8]);
 
-  // Scene 2: 0.25-0.5 progress
-  const scene2Opacity = useTransform(scrollYProgress, [0.2, 0.3, 0.45, 0.5], [0, 1, 1, 0]);
-  const scene2X = useTransform(scrollYProgress, [0.25, 0.35], [100, 0]);
+  // Scene 2: 0.2-0.46 progress
+  const scene2Opacity = useTransform(scrollYProgress, [0.18, 0.28, 0.4, 0.46], [0, 1, 1, 0]);
+  const scene2X = useTransform(scrollYProgress, [0.22, 0.32], [100, 0]);
+  const scene2TextX = useTransform(scrollYProgress, [0.22, 0.32], [-100, 0]);
 
-  // Scene 3: 0.5-0.75 progress
-  const scene3Opacity = useTransform(scrollYProgress, [0.45, 0.55, 0.7, 0.75], [0, 1, 1, 0]);
-  const scene3Y = useTransform(scrollYProgress, [0.5, 0.6], [100, 0]);
-  const scene3Scale = useTransform(scrollYProgress, [0.5, 0.6], [0.8, 1]);
+  // Scene 3: 0.4-0.96 progress (enough room for all cards to finish)
+  const scene3Opacity = useTransform(scrollYProgress, [0.38, 0.5, 0.9, 0.96], [0, 1, 1, 0]);
+  const scene3Y = useTransform(scrollYProgress, [0.44, 0.57], [90, 0]);
+  const scene3Scale = useTransform(scrollYProgress, [0.45, 0.62], [0.84, 1]);
+  const scene3CardsOpacity = useTransform(scrollYProgress, [0.5, 0.64], [0, 1]);
 
-  // Scene 4: 0.75-1 progress
-  const scene4Opacity = useTransform(scrollYProgress, [0.7, 0.8, 1], [0, 1, 1]);
-  const scene4Rotate = useTransform(scrollYProgress, [0.75, 0.85], [-10, 0]);
+  // Scene 4: 0.94-1 progress
+  const scene4Opacity = useTransform(scrollYProgress, [0.92, 0.97, 1], [0, 1, 1]);
+  const scene4Rotate = useTransform(scrollYProgress, [0.94, 0.985], [-10, 0]);
+  const scene4Scale = useTransform(scrollYProgress, [0.94, 0.985], [0.85, 1]);
 
   return (
-    <div ref={containerRef} className="relative h-[400vh]">
-      {/* Sticky container que mantiene el contenido fijo mientras se hace scroll */}
-      <div className="sticky top-0 h-screen overflow-hidden">
+    <>
+      <section className="md:hidden min-h-[72vh] flex items-center justify-center bg-gradient-to-br from-primary via-primary/90 to-primary/80 px-6 py-20">
+        <div className="text-center max-w-4xl text-primary-foreground">
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="mb-5 text-xs uppercase tracking-[0.2em] opacity-80"
+          >
+            Scroll to Explore
+          </motion.div>
+          <motion.h2
+            initial={{ y: 40, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="text-5xl sm:text-6xl mb-5 tracking-tighter text-primary-foreground"
+          >
+            The Art of
+            <br />
+            <span className="italic">Perfection</span>
+          </motion.h2>
+          <motion.p
+            initial={{ y: 40, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="text-base sm:text-lg opacity-90"
+          >
+            Every detail matters. Every moment counts.
+          </motion.p>
+        </div>
+      </section>
+
+      <div ref={containerRef} className="relative hidden md:block h-[520vh]">
+        {/* Sticky container que mantiene el contenido fijo mientras se hace scroll */}
+        <div className="sticky top-0 h-screen overflow-hidden">
 
         {/* Scene 1: Hero introduction */}
         <motion.div
@@ -86,7 +124,7 @@ export function ScrollStory() {
               </div>
             </motion.div>
             <motion.div
-              style={{ x: useTransform(scrollYProgress, [0.25, 0.35], [-100, 0]) }}
+              style={{ x: scene2TextX }}
               className="order-1 md:order-2"
             >
               <h3 className="text-5xl mb-6 tracking-tight">Crafted for Excellence</h3>
@@ -145,7 +183,7 @@ export function ScrollStory() {
                   key={item.title}
                   style={{
                     scale: scene3Scale,
-                    opacity: useTransform(scrollYProgress, [0.5 + i * 0.05, 0.55 + i * 0.05], [0, 1]),
+                    opacity: scene3CardsOpacity,
                   }}
                   className="group"
                 >
@@ -177,7 +215,7 @@ export function ScrollStory() {
         >
           <div className="text-center px-6 max-w-4xl">
             <motion.div
-              style={{ scale: useTransform(scrollYProgress, [0.75, 0.85], [0.8, 1]) }}
+              style={{ scale: scene4Scale }}
             >
               <h3 className="text-6xl md:text-7xl mb-8 tracking-tight text-primary-foreground">
                 Your Journey
@@ -210,7 +248,8 @@ export function ScrollStory() {
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Scroll</p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

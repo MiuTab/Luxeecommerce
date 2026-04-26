@@ -1,13 +1,25 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
-import { Star, Heart, ShoppingCart, Check, Truck, Shield, RotateCcw } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Check, Truck, Shield, RotateCcw, ArrowLeft } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface ProductDetailProps {
   productId: number;
   onAddToCart: (product: any) => void;
   onRelatedProductClick: (id: number) => void;
+  onBackToShop: () => void;
 }
+
+const productCatalog = [
+  { id: 1, name: 'Premium Wireless Headphones', price: 299, rating: 4.8, category: 'Audio', image: 'https://images.unsplash.com/photo-1765279327575-bc9e453514dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 2, name: 'Luxury Smartwatch', price: 599, rating: 4.9, category: 'Watches', image: 'https://images.unsplash.com/photo-1749831754129-3a84b9fdeb87?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 3, name: 'Minimalist Sneakers', price: 189, rating: 4.7, category: 'Footwear', image: 'https://images.unsplash.com/photo-1625860191460-10a66c7384fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 4, name: 'Modern Tech Backpack', price: 159, rating: 4.6, category: 'Accessories', image: 'https://images.unsplash.com/photo-1594299447935-e5b840f54b9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 5, name: 'Wireless Earbuds Pro', price: 249, rating: 4.8, category: 'Audio', image: 'https://images.unsplash.com/photo-1738920424218-3d28b951740a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 6, name: 'Classic Leather Watch', price: 449, rating: 4.9, category: 'Watches', image: 'https://images.unsplash.com/photo-1670177257750-9b47927f68eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 7, name: 'Performance Running Shoes', price: 199, rating: 4.7, category: 'Footwear', image: 'https://images.unsplash.com/photo-1631984564919-1f6b2313a71c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+  { id: 8, name: 'Premium Tech Bag', price: 189, rating: 4.8, category: 'Accessories', image: 'https://images.unsplash.com/photo-1667411424961-a942201b77ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
+];
 
 const productData: any = {
   1: {
@@ -48,8 +60,22 @@ const relatedProducts = [
   { id: 7, name: 'Performance Running Shoes', price: 199, image: 'https://images.unsplash.com/photo-1631984564919-1f6b2313a71c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
 ];
 
-export function ProductDetail({ productId, onAddToCart, onRelatedProductClick }: ProductDetailProps) {
-  const product = productData[productId] || productData[1];
+export function ProductDetail({ productId, onAddToCart, onRelatedProductClick, onBackToShop }: ProductDetailProps) {
+  const catalogProduct = productCatalog.find((item) => item.id === productId);
+  const fallbackCatalogProduct = productCatalog[0];
+  const product = productData[productId] || (catalogProduct
+    ? {
+        ...catalogProduct,
+        reviews: Math.round(catalogProduct.rating * 80),
+        description: `Discover refined ${catalogProduct.category.toLowerCase()} design with premium materials and performance built for everyday luxury.`,
+        images: [catalogProduct.image, catalogProduct.image, catalogProduct.image],
+        colors: ['Black', 'Sand', 'Ivory'],
+        features: ['Premium Materials', 'Modern Design', 'Comfort-Focused Build', '2 Year Warranty'],
+      }
+    : {
+        ...productData[1],
+        image: fallbackCatalogProduct.image,
+      });
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [quantity, setQuantity] = useState(1);
@@ -65,12 +91,22 @@ export function ProductDetail({ productId, onAddToCart, onRelatedProductClick }:
   return (
     <div className="min-h-screen pt-32 pb-24 px-6">
       <div className="max-w-7xl mx-auto">
+        <motion.button
+          onClick={onBackToShop}
+          whileHover={{ x: -2 }}
+          whileTap={{ scale: 0.96 }}
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-4 py-2 text-sm hover:bg-accent transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Shop</span>
+        </motion.button>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="sticky top-32 h-fit"
+            className="h-fit lg:sticky lg:top-32"
           >
             <div className="aspect-square mb-4 rounded-3xl overflow-hidden bg-accent">
               <AnimatePresence mode="wait">
